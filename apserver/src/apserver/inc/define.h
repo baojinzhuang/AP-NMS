@@ -34,46 +34,68 @@
 #define web_apServer_configure_time web_apServer_heart_time+1
 #define apServer_apAgent_configure_time apServer_apAgent_heart_time
 #define web_apServer_heart_out_time 3*web_apServer_heart_time
-
-
+#define web_apServer_upgrade_time 60
+#define apServer_apAgent_upgrade_time 60
+#define web_apServer_log_get_time 6
+#define apServer_apAgent_log_get_time 6
 
 
 //状态
-#define WEB_APSERVER_OFF 0
-#define WEB_APSERVER_CONNECTING 1
-#define WEB_APSERVER_ON 2
-#define WEB_APSERVER_CONFIGURING 3
+#define WEB_APSERVER_OFF              0
+#define WEB_APSERVER_CONNECTING       1
+#define WEB_APSERVER_ON               2
+#define WEB_APSERVER_CONFIGURING      3//1
+#define WEB_APSERVER_SOFTWARE_UPGRADE 4//2
+#define WEB_APSERVER_LOGINFO          5//3
 
 
-#define AP_APSERVER_OFF 0
-#define AP_APSERVER_CONNECTING 1
-#define AP_APSERVER_ON 2
-#define AP_APSERVER_CONFIGURING 3
+#define AP_APSERVER_OFF               0
+#define AP_APSERVER_CONNECTING        1
+#define AP_APSERVER_ON                2
+#define AP_APSERVER_CONFIGURING       3//1
+#define AP_APSERVER_SOFTWARE_UPGRADE  4//2
+#define AP_APSERVER_GET_LOGINFO       5//3
+
 
 #define AP_OFF_LINE 0
 #define AP_ON_LINE  1
 
 //configure result
-#define CONFIGURE_OK   1
-#define CONFIGURE_NOK  2
+#define CONFIGURE_OK       1
+#define CONFIGURE_NOK      2
 #define CONFIGURE_TIMEOUT  3
 
+//软件升级结果
+#define SOFTWARE_UPGRADE_OK       1
+#define SOFTWARE_UPGRADE_NOK      2
+#define SOFTWARE_UPGRADE_TIMEOUT  3
+
+//请求日志结果
+#define REQUEST_LOGINFO_OK       1
+#define REQUEST_LOGINFO_NOK      2
+#define REQUEST_LOGINFO_TIMEOUT  3
 
 
-//消息
-#define APSERVER_AP_REGISTER_ACK 0
-#define APSERVER_AP_REGISTER_REJ 1
-#define APSERVER_AP_CONFIGURE    2
-#define APSERVER_AP_HEART_BEAT   3
 
+//消息Apserver-ap
+#define APSERVER_AP_REGISTER_ACK      0
+#define APSERVER_AP_REGISTER_REJ      1
+#define APSERVER_AP_CONFIGURE         2
+#define APSERVER_AP_HEART_BEAT        3
+#define APSERVER_AP_SOFTWARE_UPGRADE  4    //软件升级
+#define APSERVER_AP_REQUEST_LOGINFO   5    //请求日志
+
+//Apserver<--->Web
 #define APSERVER_WEB_TEMPLATE_REPORT     10
 #define APSERVER_WEB_AP_REPORT           1
 #define APSERVER_WEB_TEMPLATE_MODIFY     2
 #define APSERVER_WEB_AP_MODIFY           3
 #define APSERVER_WEB_AP_CONFIGURE        4
 #define APSERVER_WEB_HEART_BEAT          5
+#define APSERVER_WEB_SOFTWARE_UPGRADE    6  //软件升级
+#define APSERVER_WEB_REQUEST_LOGINFO     7  //请求日志
 
-
+//消息ap--Apserver
 #define	AP_APSERVER_REGISTER_REQ_WITHOUT_CONFIGURATION                 0
 #define	AP_APSERVER_REGISTER_REQ_WITH_CONFIGURATION                    1
 #define	AP_APSERVER_REGISTER_COMPLETE                                  2
@@ -81,6 +103,9 @@
 #define	AP_APSERVER_CONFIGURE_NOK                                      4
 #define	AP_APSERVER_HEART_BEAT_ACK                                     5
 #define	AP_APSERVER_HEART_BEAT_ACK_WITH_STATUS                         6
+#define	AP_APSERVER_REQUEST_LOGINFO                                    7
+
+
 
 
 #define TRUE	1
@@ -179,6 +204,10 @@ typedef struct
 	gateway ap_gateway;
 	struct in_addr AP_Server_IP;
 	unsigned char options;
+	char Scp_Username[50];//用户名
+	char  Scp_PassWord[20];    //密码
+	char Remote_FilePath[50]; //远程路径
+	char version[version_length];//版本
 }AP_Configuration_template;
 
 typedef struct
@@ -210,7 +239,6 @@ typedef struct
 	AP_Configuration_template  ap_template;
 }legalAP_operation_req;
 
-
 typedef struct
 {
 	char command;//0:add  1:del  2:modify   
@@ -223,6 +251,15 @@ typedef struct
 	char AP_SN[APSN_length];
 }legalAP_operation_ack;
 
+typedef struct
+{
+	char ack;//0:sucess  1:fail 
+	char AP_SN[APSN_length];
+	char Scp_Username[50];//用户名
+	char  Scp_PassWord[20];    //密码
+	char Remote_FilePath[50]; //远程路径
+	char version[version_length];//版本
+}AP_upgrade_ack;
 
 typedef struct
 {
@@ -240,7 +277,7 @@ typedef struct
 typedef struct
 {
     int ap_timer_flag;//0:off,1:connecting,2:on
-	int ap_on_timer_flag;//0:nothing,1:configuring,2:upgrading
+	int ap_on_timer_flag;//0:nothing,1:configuring,2:upgrading,3:log get
     int heart_beat_timer;
 	int heart_beat_timeout_times;
 	int ap_on_timer;
@@ -251,12 +288,3 @@ typedef struct
     struct sockaddr_in addrAP;
     socklen_t addrlen;
 } AP_socket; 
-
-
-
-
-
-
-
-
-
