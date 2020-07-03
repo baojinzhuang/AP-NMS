@@ -15,18 +15,32 @@ history:
 
 
 //全局变量
+int status;
 int g_level = 0;
 AP_Configuration_template apTemplate[max_template];
 AP ap_list[max_ap];
 int legalTemplate[max_template];
 int legalAP[max_ap];
 int legalAPConfigureResult[max_ap];//0，配置成功，1，配置失败，2，配置超时
+
+int legalAPUpgradeResult[max_ap];//0，软件升级成功，1，软件升级失败，2，软件升级超时
+int legalAPLogGetResult[max_ap];//0，获取日志成功，1，获取日志失败，2，获取日志超时
+AP_upgrade_ack AP_upgrade_log_ack[max_ap];
+
 AP_timer legalAPTimer[max_ap];
 int Webtimerflag = 0; //0,不启动，1,启动中，2,正常通信中
-int WebOntimerflag = 0; //0,正常通信中，1,正常通信配置中，2,正常通信升级中
+int WebOntimerflag = 0; //0,正常通信中，1,正常通信配置中，2,正常通信升级中,3，正常通信获取日志中
 int webTimer = 0;
 int webOnTimer = 0;
-
+ 
+//本地log路径，用户名和密码
+char Loacl_Upgrade_FilePath[50] = "/var/";
+char LocalUsername[50] = "root";
+char LoaclPassWord[20];
+char Scp_Exe[1024];
+char LogFilePath[150];
+int AP_Upgrade_Num = 0;//需要升级AP的数量
+int AP_GetLog_Num = 0;//获取AP日志的数量
 //socket with web
 int sockWeb = -1;
 struct sockaddr_in addrWebSer;  //创建一个记录地址信息的结构体 
@@ -73,7 +87,7 @@ void send_to_ap(int apIndex, int command,AP_Configuration_template* tempTemplate
 void send_to_web(char command,char* sendbuf2,int length);
 void  connect_to_web();
 int read_AP_Server_configure_file(const char *filename);
-
+void upgrade_ack_report();
 
 void* socket_with_ap(int* apIndex)
 {
@@ -184,7 +198,7 @@ void* socket_with_web(int* apIndex)
 
 
 
-void prompt_info(int signo)
+void prompt_info(int signo)//todo
 
 {
     //printf("%d\n",signo);
@@ -199,12 +213,10 @@ void prompt_info(int signo)
 		{
 			Webtimerflag=WEB_APSERVER_CONNECTING;
 			webTimer=web_apServer_heart_time*3;
-
 			send_to_web(APSERVER_WEB_TEMPLATE_REPORT,NULL,0);
 			log_info("Info: APSERVER_WEB_TEMPLATE_REPORT\n");
 			send_to_web(APSERVER_WEB_AP_REPORT,NULL,0);
 			log_info("Info: APSERVER_WEB_AP_REPORT\n");
-	
 		}
 		break;
 		case WEB_APSERVER_CONNECTING:
@@ -233,6 +245,25 @@ void prompt_info(int signo)
 					send_to_web(APSERVER_WEB_AP_CONFIGURE,NULL,0);
 					log_info("Info: APSERVER_WEB_AP_CONFIGURE time out\n");
 					WebOntimerflag=0;
+				}
+				break;
+			case 2://Softupdate
+				//wait 30s
+				webOnTimer--;
+				if (webOnTimer == 0)
+				{
+					send_to_web(APSERVER_WEB_SOFTWARE_UPGRADE, NULL, 0);
+					log_info("Info: APSERVER_WEB_SoftWare_Upgrade time out\n");
+					WebOntimerflag = 0;
+				}
+				break; 
+			case 3://get log
+				webOnTimer--;
+				if (webOnTimer == 0)
+				{
+					send_to_web(APSERVER_WEB_REQUEST_LOGINFO, NULL, 0);
+					log_info("Info:  APSERVER_AP_Request_LogInfo time out\n");
+					WebOntimerflag = 0;
 				}
 				break;
 				default:
@@ -288,6 +319,26 @@ void prompt_info(int signo)
 							legalAPTimer[i].ap_on_timer_flag=0;
 						}
 						break;
+
+					case 2:	//soft_upgrade
+						//wait 30s
+						legalAPTimer[i].ap_on_timer--;
+						if (legalAPTimer[i].ap_on_timer == 0)
+						{
+							legalAPUpgradeResult[i] = CONFIGURE_TIMEOUT;
+							legalAPTimer[i].ap_on_timer_flag = 0;
+						}
+						break;
+
+					case 3:	//get log
+						legalAPTimer[i].ap_on_timer--;
+						if (legalAPTimer[i].ap_on_timer == 0)
+						{
+							legalAPLogGetResult[i] = CONFIGURE_TIMEOUT;
+							legalAPTimer[i].ap_on_timer_flag = 0;
+						}
+						break;
+
 					default:
 							printf("undefined state of APOntimerflag");
 				}
