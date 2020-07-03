@@ -19,7 +19,21 @@ extern AP ap_list[max_ap];
 extern int legalTemplate[max_template];
 extern int legalAP[max_ap];
 extern int legalAPConfigureResult[max_ap];//0，未配置，1，配置成功，2，配置失败，3，配置超时
+extern int legalAPUpgradeResult[max_ap];//0，软件升级成功，1，软件升级失败，2，软件升级超时
+extern int legalAPLogGetResult[max_ap];//0，获取日志成功，1，获取日志失败，2，获取日志超时
+extern AP_upgrade_ack AP_upgrade_log_ack[max_ap];
+extern int status;
+
 extern AP_timer legalAPTimer[max_ap];
+extern char Loacl_Upgrade_FilePath[50];
+extern char LocalUsername[50];
+extern char LoaclPassWord[20];
+extern char Scp_Exe[1024];
+extern char LogFilePath[50];
+extern char AP_Server_IP[50];
+extern char Web_Server_IP[50];
+extern int AP_Upgrade_Num;
+extern int AP_GetLog_Num;
 
 extern AP_socket ap_socket_list[max_ap];
 extern int sockSer;
@@ -29,7 +43,7 @@ extern struct sockaddr_in addrWebSer;  //创建一个记录地址信息的结构
 extern socklen_t addrWeblen;
 
 extern int Webtimerflag; //0,不启动，1,启动中，2,正常通信中
-extern int WebOntimerflag; //0,正常通信中，1,正常通信配置中，2,正常通信升级中
+extern int WebOntimerflag; //0,正常通信中，1,正常通信配置中，2,正常通信升级中,，3，正常通信获取日志中
 extern int webTimer;
 extern int webOnTimer;
 
@@ -46,103 +60,177 @@ void init_legalTemplate();
 void init_legalAP();
 void print_templates();
 void print_aps();
+void upgrade_ack_report();
+void log_info_report();
+void Create_LogDir(char* filename);
+void configure_reprot();
 
+void decode_web_AP_log_requestMsg(char* buf);
 
-
-
-
-void send_to_ap(int apIndex, int command,AP_Configuration_template* tempTemplate)
+/*command  AP_Configuration_template* tempTemplate*/
+void send_to_ap(int apIndex, int command,AP_Configuration_template* tempTemplate)//decode解析Web命令，然后发数据给AP
 {
-    char sendbuf[sizeof(AP)+1];    //申请一个发送数据缓存区
-    char* p=sendbuf;
-	AP_Configuration_template* pp=&(apTemplate[ap_list[apIndex].configure.templateIndex]);
+	char sendbuf[sizeof(AP) + 1];    //申请一个发送数据缓存区
+	char* p = sendbuf;
+	AP_Configuration_template* pp = &(apTemplate[ap_list[apIndex].configure.templateIndex]);
 
-    *p=command;
+	*p = command;
 	p++;
-	printf("after p++ apIndex=%d\n",apIndex);
+	printf("after p++ apIndex=%d\n", apIndex);
 	//return;
 
-	if(legalAP[apIndex]==1)
-		switch(command)
-			{
-			case APSERVER_AP_REGISTER_ACK:
-				memcpy(p,(char *)pp,sizeof(AP_Configuration_template));
-				sendto(sockSer,sendbuf,sizeof(AP_Configuration_template)+2,0,(struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen); 
-				break;
-			case APSERVER_AP_REGISTER_REJ:
-				sendto(sockSer,sendbuf,2,0,(struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen); 
-				break;
-			case APSERVER_AP_CONFIGURE:
-				memcpy(p,tempTemplate,sizeof(AP_Configuration_template));
-				sendto(sockSer,sendbuf,sizeof(AP_Configuration_template)+2,0,(struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen); 
-				break;
-			case APSERVER_AP_HEART_BEAT:
-				sendto(sockSer,sendbuf,2,0,(struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen); 
-				break;
-
-			default:
-				printf("undefined command AP Server to AP");
+	if (legalAP[apIndex] == 1)
+		switch (command)
+		{
+		case APSERVER_AP_REGISTER_ACK:
+			memcpy(p, (char*)pp, sizeof(AP_Configuration_template));
+			sendto(sockSer, sendbuf, sizeof(AP_Configuration_template) + 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		case APSERVER_AP_REGISTER_REJ:
+			sendto(sockSer, sendbuf, 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		case APSERVER_AP_CONFIGURE:
+			memcpy(p, tempTemplate, sizeof(AP_Configuration_template));
+			sendto(sockSer, sendbuf, sizeof(AP_Configuration_template) + 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		case AP_APSERVER_SOFTWARE_UPGRADE:
+			memcpy(p, tempTemplate, sizeof(AP_Configuration_template));
+			sendto(sockSer, sendbuf, sizeof(AP_Configuration_template) + 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		case AP_APSERVER_REQUEST_LOGINFO:
+			memcpy(p, tempTemplate, sizeof(AP_Configuration_template));
+			sendto(sockSer, sendbuf, sizeof(AP_Configuration_template) + 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		case APSERVER_AP_HEART_BEAT:
+			sendto(sockSer, sendbuf, 2, 0, (struct sockaddr*)&ap_socket_list[apIndex].addrAP, ap_socket_list[apIndex].addrlen);
+			break;
+		default:
+			printf("undefined command AP Server to AP");
 		}
+}
 
+void send_to_web(char command, char* sendbuf2, int length)//decode后使用   回的都是Ack？
+{
+	switch (command)
+	{
+	case APSERVER_WEB_TEMPLATE_REPORT:
+		template_report();
+		break;
+	case APSERVER_WEB_AP_REPORT:
+		ap_report();
+		break;
+	case APSERVER_WEB_TEMPLATE_MODIFY:
+		sendto(sockWeb, sendbuf2, length, 0, (struct sockaddr*)&addrWebSer, addrWeblen);
+		break;
+	case APSERVER_WEB_AP_MODIFY:
+		sendto(sockWeb, sendbuf2, length, 0, (struct sockaddr*)&addrWebSer, addrWeblen);
+		break;
+	case APSERVER_WEB_AP_CONFIGURE:
+		configure_reprot();
+		break;
+	case APSERVER_WEB_SOFTWARE_UPGRADE://软件升级结果上报
+		upgrade_ack_report();
+		break;
+	case APSERVER_WEB_REQUEST_LOGINFO://将获取的日志的路径，用户名，密码上报
+		log_info_report();
+		break;
+	case APSERVER_WEB_HEART_BEAT:
+		sendto(sockWeb, sendbuf2, length, 0, (struct sockaddr*)&addrWebSer, addrWeblen);
+		break;
+
+	default:
+		printf("undefined command AP Server to WEB");
+	}
 
 }
 
-void configure_reprot()
+void configure_reprot()//配置ack上报到Web
 {
     int i=0,size = 0;
 	AP_configuration_ack* ap_configuration;
-	char sendbuf[sizeof(AP_configuration_ack)*max_ap+1]={"\0"};
+	char sendbuf[sizeof(AP_configuration_ack)*max_ap+2]={"\0"};
 	char* p=sendbuf+2;
 
 	ap_configuration = (AP_configuration_ack*)p;
 
-	for(i=0;i<max_ap;i++)
-		if(legalAPConfigureResult[i])
-			{
+	for (i = 0; i < max_ap; i++)
+	{
+		if (legalAPConfigureResult[i])
+		{
 			size++;
-			ap_configuration->ack=legalAPConfigureResult[i];
-			strcpy(ap_configuration->AP_SN,ap_list[i].AP_SN);
-			}
-			
+			ap_configuration->ack = legalAPConfigureResult[i];
+			strcpy(ap_configuration->AP_SN, ap_list[i].AP_SN);
+			ap_configuration++;
+		}
+	}
 	sendbuf[1]=size;
 	sendbuf[0]=APSERVER_WEB_AP_CONFIGURE;
 	sendto(sockWeb,sendbuf,size*sizeof(AP_configuration_ack)+2,0,(struct sockaddr*)&addrWebSer, addrWeblen); 
 	printf("enter configure report size=%d",size);
-
 	for(i=0;i<max_ap;i++)
 		legalAPConfigureResult[i]=0;
-
 }
 
-
-void send_to_web(char command,char* sendbuf2,int length)
+/*     commadn  size AP_upgrade_ack *size    */
+void upgrade_ack_report()
 {
-
-	switch(command)
+	int i = 0;
+	AP_upgrade_ack* ap_upgrade;
+	char sendbuf[sizeof(AP_upgrade_ack) * max_ap + 2] = { "\0" };
+	char* p = sendbuf + 2;
+	ap_upgrade = (AP_upgrade_ack*)p;
+	//AP_upgrade_ack AP_upgrade_log_ack[max_ap]
+	for (i = 0; i < AP_Upgrade_Num; i++)
 	{
-		case APSERVER_WEB_TEMPLATE_REPORT:
-		template_report();
-		break;
-		case APSERVER_WEB_AP_REPORT:
-		ap_report();
-		break;
-		case APSERVER_WEB_TEMPLATE_MODIFY:
-		sendto(sockWeb,sendbuf2,length,0,(struct sockaddr*)&addrWebSer, addrWeblen); 
-		break;
-		case APSERVER_WEB_AP_MODIFY:
-		sendto(sockWeb,sendbuf2,length,0,(struct sockaddr*)&addrWebSer, addrWeblen); 
-		break;
-		case APSERVER_WEB_AP_CONFIGURE:
-		configure_reprot(); 
-		break;
-		case APSERVER_WEB_HEART_BEAT:
-		sendto(sockWeb,sendbuf2,length,0,(struct sockaddr*)&addrWebSer, addrWeblen); 
-		break;
-	
-		default:
-		printf("undefined command AP Server to WEB");
+		if (AP_upgrade_log_ack[i].ack == 0)
+		{
+			ap_upgrade->ack = AP_upgrade_log_ack[i].ack;
+			strcpy(ap_upgrade->AP_SN, AP_upgrade_log_ack[i].AP_SN);
+		}
+		else
+		{
+			ap_upgrade->ack = 1;
+			strcpy(ap_upgrade->AP_SN, AP_upgrade_log_ack[i].AP_SN);
+		}
+		ap_upgrade++;
 	}
-	
+	sendbuf[1] = AP_Upgrade_Num;
+	sendbuf[0] = APSERVER_WEB_SOFTWARE_UPGRADE;
+	sendto(sockWeb, sendbuf, AP_Upgrade_Num * sizeof(AP_upgrade_ack) + 2, 0, (struct sockaddr*)&addrWebSer, addrWeblen);
+	printf("enter upgrade report size=%d", AP_Upgrade_Num);
+	memset(AP_upgrade_log_ack, 0, sizeof(AP_upgrade_ack) * AP_Upgrade_Num);//升级ack确认信息清0
+	AP_Upgrade_Num = 0;
+}
+
+void log_info_report()
+{
+	int i = 0;
+	AP_upgrade_ack* ap_upgrade;
+	char sendbuf[sizeof(AP_upgrade_ack) * max_ap + 2] = { "\0" };
+	char* p = sendbuf + 2;
+	ap_upgrade = (AP_upgrade_ack*)p;
+	//AP_upgrade_ack AP_upgrade_log_ack[max_ap]
+	for (i = 0; i < AP_GetLog_Num; i++)
+	{
+		if (AP_upgrade_log_ack[i].ack == 0 )
+		{
+			ap_upgrade->ack = AP_upgrade_log_ack[i].ack;
+			strcpy(ap_upgrade->AP_SN, AP_upgrade_log_ack[i].AP_SN);
+			strcpy(ap_upgrade->Remote_FilePath,LogFilePath);
+		}
+		else 
+		{
+			ap_upgrade->ack = 1;
+			strcpy(ap_upgrade->AP_SN, AP_upgrade_log_ack[i].AP_SN);
+		}
+		ap_upgrade++;
+	}
+	sendbuf[1] = AP_GetLog_Num;
+	sendbuf[0] = APSERVER_WEB_REQUEST_LOGINFO;
+	sendto(sockWeb, sendbuf, AP_GetLog_Num * sizeof(AP_upgrade_ack) + 2, 0, (struct sockaddr*)&addrWebSer, addrWeblen);
+	printf("enter loglog report size=%d", AP_GetLog_Num);
+	memset(AP_upgrade_log_ack, 0, sizeof(AP_upgrade_ack) * AP_GetLog_Num);//日志ack确认信息清0
+	AP_GetLog_Num = 0;
 }
 
 
@@ -170,9 +258,9 @@ int assign_apIndex()
 
 }
 
-
 void ap_configure_assign_value(AP* destination,AP* source)
-{
+{
+
 	destination->configure.templateIndex=source->configure.templateIndex;
 	destination->configure.ap_gateway.gateway=source->configure.ap_gateway.gateway;
     destination->configure.ap_gateway.subnetmask=source->configure.ap_gateway.subnetmask;
@@ -186,10 +274,15 @@ void ap_configure_assign_value(AP* destination,AP* source)
 	destination->configure.pool.start = source->configure.pool.start;
 	destination->configure.pool.end = source->configure.pool.end;
 	destination->configure.AP_Server_IP=source->configure.AP_Server_IP;
+	strcpy(destination->configure.Remote_FilePath, source->configure.Remote_FilePath);
+	strcpy(destination->configure.Scp_Username, source->configure.Scp_Username);
+	strcpy(destination->configure.Scp_PassWord, source->configure.Scp_PassWord);
+
 }
 
 void ap_status_assign_value(AP* destination,AP* source)
-{
+{
+
 	destination->status.online_state = source->status.online_state;
 	destination->status.antenna_number = source->status.antenna_number;
 	destination->status.model = source->status.model;
@@ -203,10 +296,14 @@ void ap_status_assign_value(AP* destination,AP* source)
 
 void  dispatch_apMsg(int ap_index,char* buf)
 {
+
 	char* p=buf;
 	AP* pp=(AP*)(p+1);
-
-
+	int i = 0;
+	char tftp[512] = {"\0"};
+	char ap_ip[64] = { "\0" };
+	char path[256] = { "\0" };
+	//some information
 	switch(buf[0])
 	{
 	case AP_APSERVER_REGISTER_REQ_WITHOUT_CONFIGURATION:
@@ -256,11 +353,57 @@ void  dispatch_apMsg(int ap_index,char* buf)
 		printf("AP:%s's state is %d\n",ap_list[ap_index].AP_SN,ap_list[ap_index].status.online_state);
 		printf("AP:%s's antenna number is %d\n",ap_list[ap_index].AP_SN,ap_list[ap_index].status.antenna_number);
         break;
+	case AP_APSERVER_REQUEST_LOGINFO:
+		strcpy(ap_ip, inet_ntoa(ap_list[ap_index].configure.AP_IP));
+		Create_LogDir(path);
+		strcpy(LogFilePath, path);
+		//strcpy(path, ap_list[ap_index].configure.Remote_FilePath);
+		snprintf(tftp, 256, "tftp %s get %s %s", ap_ip, ap_list[ap_index].configure.Remote_FilePath,LogFilePath); //to do
+		status = system(tftp);//获取日志文件，存到本地，定时器结束后直接发送给web？信息的保存sendtoweb,  判断执行完毕，，，，，，to do
+		if (-1 == status) {
+			printf("tftp error");
+		}
+		else if (!WIFEXITED(status)) {
+			printf("tftp error");
+		}
+		else if (WEXITSTATUS(status)) {
+			printf("tftp error");
+		}
+		else
+		{
+			printf("tftp success");
+		}
+		//legalAPTimer[ap_index].ap_on_timer_flag = 0;
+		//strcpy(AP_upgrade_log_ack[0], ap_list[ap_index].AP_SN);
+		
+		for (i = 0; i < max_ap; i++) 
+		{
+			if (strcmp(ap_list[ap_index].AP_SN, AP_upgrade_log_ack[i].AP_SN) == 0)
+			{
+				AP_upgrade_log_ack[i].ack = 0;
+			}
+		}
+		log_info("Info: receive AP_APSERVER_REQUEST_LOGINFO_OK AP=%s\n", ap_list[ap_index].AP_SN);
+		break;
 	case AP_APSERVER_HEART_BEAT_ACK_WITH_STATUS:
 		legalAPTimer[ap_index].heart_beat_timer = apServer_apAgent_heart_time;
 		legalAPTimer[ap_index].heart_beat_timeout_times = 0;
 		ap_status_assign_value(&ap_list[ap_index],pp);
 		ap_list[ap_index].status.online_state = 1;
+		for (i = 0; i < max_ap; i++)//获取软件升级的结果
+		{
+			if (strcmp(ap_list[ap_index].AP_SN, AP_upgrade_log_ack[i].AP_SN) == 0)
+			{
+				if (strcmp(ap_list[ap_index].status.version, AP_upgrade_log_ack[i].version) == 0)
+				{
+					AP_upgrade_log_ack[i].ack = 0;
+				}
+				else
+				{
+					AP_upgrade_log_ack[i].ack = 1;
+				}
+			}
+		}
 		//log_info("Info: receive AP_APSERVER_HEART_BEAT_ACK_WITH_STATUS AP=%s\n",ap_list[ap_index].AP_SN);
         break;
 		
@@ -273,7 +416,8 @@ void  dispatch_apMsg(int ap_index,char* buf)
 }
 
 void template_assign_value(AP_Configuration_template* destination,AP_Configuration_template* source)
-{
+{
+
 	destination->templateIndex=source->templateIndex;
 	destination->ap_gateway.gateway=source->ap_gateway.gateway;
     destination->ap_gateway.subnetmask=source->ap_gateway.subnetmask;
@@ -287,10 +431,13 @@ void template_assign_value(AP_Configuration_template* destination,AP_Configurati
 	destination->pool.start = source->pool.start;
 	destination->pool.end = source->pool.end;
 	destination->AP_Server_IP = source->AP_Server_IP;
+	strcpy(destination->Remote_FilePath, source->Remote_FilePath);
+	strcpy(destination->Scp_Username, source->Scp_Username);
+	strcpy(destination->Scp_PassWord, source->Scp_PassWord);
 }
 
 
-void template_report()
+void template_report()//将模板发送到Web
 {
     int i=0,size=0;
     char sendbuf[bufsize_apToWeb1];    //申请一个发送数据缓存区
@@ -343,10 +490,7 @@ void ap_report()
 	sendbuf2[1]=size;
 	log_info("Info: send_to_web:ap_report,size=%d\n",sendbuf2[1]);
 	sendto(sockWeb, sendbuf2, bufsize_apToWeb2, 0, (struct sockaddr*)&addrWebSer, addrWeblen);   
-
-
 }
-
 
 void  connect_to_web()
 {
@@ -360,8 +504,7 @@ void  connect_to_web()
 }
 
 
-
-void decode_web_template_modifyMsg(char* buf)
+void decode_web_template_modifyMsg(char* buf)//修改AP后，产生ACk，将ACK发给Web
 {	
 	int i=0,size = buf[1];
 	template_operation_req* template_Operation;
@@ -408,7 +551,6 @@ void decode_web_template_modifyMsg(char* buf)
 					add_template_file(template_Operation->ap_template.templateIndex);
 					break;
 					break;
-
 				default:
 				log_error("Error: Unknown templdate operation=%d\n", template_Operation->command);
 				break;
@@ -499,7 +641,8 @@ void decode_web_AP_modifyMsg(char* buf)
 		}
 
 }
-void decode_web_AP_configurationMsg(char* buf)
+
+void decode_web_AP_configurationMsg(char* buf)//把配置发送给AP，ack在main.c里进行回复
 {
 	int i=0,size = buf[1],apIndex=-1;
 	AP_Configuration_template* ap_Operation;
@@ -533,6 +676,98 @@ void decode_web_AP_configurationMsg(char* buf)
 			}
 		}
 
+}
+//Scp  username = ap_info->username filepath = ap_info->filepath     ///软件升级
+//   -------------------------------------------------
+//   |command|size =10|AP_opertion_req|*size|文件名？|
+//   -------------------------------------------------
+void decode_web_AP_log_requestMsg(char* buf)//done 解析获取日志信息，并将消息转发给对应的AP
+{
+	int i = 0, size = buf[1], apIndex = -1;
+	legalAP_operation_req* ap_info;
+	//char* p = NULL;
+	char sn[APSN_length] = { "\0" };
+	AP_GetLog_Num = size;
+	if (size > 0 && size < max_ap)
+	{
+		ap_info = (legalAP_operation_req*)&buf[2];
+		for (i = 0; i < size; i++)
+		{
+			strcpy(sn, ap_info->AP_SN);
+			apIndex = LegalAP_find(sn);
+			if (apIndex != -1)
+			{
+				strcpy(AP_upgrade_log_ack[i].AP_SN, ap_info->AP_SN);//获取需要日志的AP的序列号
+				send_to_ap(apIndex, APSERVER_AP_REQUEST_LOGINFO, &(ap_info->ap_template));
+				log_info("Info: send_to_ap:APSERVER_AP_Request_LogInfo AP:%s\n", ap_list[apIndex].AP_SN);
+				legalAPTimer[i].ap_on_timer_flag = 3;
+				legalAPTimer[i].ap_on_timer = apServer_apAgent_log_get_time;
+				WebOntimerflag = 3;
+				webOnTimer = web_apServer_log_get_time;
+				legalAPTimer[apIndex].ap_on_timer_flag = 3;
+			}
+			else
+			{
+				log_error("Error: Unknown AP SN=%s\n", sn);
+			}
+			ap_info = ap_info + 1;
+		}
+	}
+}
+
+void decode_web_AP_Soft_UpgradeMsg(char* buf) //todo 解析软件升级信息，将软件升级的文件转存到本地，并将文件转发给对应的AP
+{
+	int i = 0, size = buf[1], apIndex = -1;
+	legalAP_operation_req* ap_info;
+	//char* p = NULL;
+	char sn[APSN_length] = { "\0" };
+	//p = buf + 2;
+	AP_Upgrade_Num = size;//升级AP的数量
+	if (size > 0 && size < max_ap)
+	{
+		ap_info = (legalAP_operation_req*)&buf[2];
+		snprintf(Scp_Exe, 512, "scp %s@%s:%s %s", ap_info->ap_template.Scp_Username, Web_Server_IP, ap_info->ap_template.Remote_FilePath, Loacl_Upgrade_FilePath);
+		printf("scp to do is: %s", Scp_Exe);
+		status = system(Scp_Exe);                    //Scp获取web的软件升级文件,存到本地  done
+		if (-1 == status) {
+			printf("scp error");
+		}
+		if (!WIFEXITED(status)) {
+			printf("scp error");
+		}
+		if (WEXITSTATUS(status)) {
+			printf("scp error");
+		}
+		else {
+			printf("scp success");
+		}
+		//
+		for (i = 0; i < size; i++)
+		{
+			//直接把WEB发送过来的软件升级路径传给AP
+			strcpy(AP_upgrade_log_ack[i].AP_SN,ap_info->AP_SN);//存取 升级的AP信息用于记录比较是否升级成功,记录版本信息
+			strcpy(AP_upgrade_log_ack[i].version, ap_info->ap_template.version);
+
+			strcpy(sn, ap_info->AP_SN);
+			apIndex = LegalAP_find(sn);
+			if (apIndex != -1)
+			{
+				send_to_ap(apIndex, APSERVER_AP_SOFTWARE_UPGRADE, &(ap_info->ap_template));//转发给AP
+				log_info("Info: send_to_ap:WEB_APSERVER_SOFTWARE_UPGRADE AP:%s\n", ap_list[apIndex].AP_SN);
+				legalAPTimer[i].ap_on_timer_flag = 2;
+				legalAPTimer[i].ap_on_timer = apServer_apAgent_upgrade_time;
+				WebOntimerflag = 2;
+				webOnTimer = web_apServer_upgrade_time;
+				legalAPTimer[apIndex].ap_on_timer_flag = 2;
+			}
+			else
+			{
+				log_error("Error: Unknown AP SN=%s\n", sn);
+			}
+			ap_info = ap_info + 1;
+			//p = p + 1;
+		}
+	}
 }
 
 void decode_web_template_reportMsg(char* buf)
@@ -577,7 +812,7 @@ void decode_web_AP_reportMsg(char* buf)
 			ap_configure_assign_value(&ap_list[i],ap_operation);
 			ap_status_assign_value(&ap_list[i],ap_operation);
 			}
-		write_ap_set();
+		write_ap_set();//写入文件
 		}
 }
 
@@ -610,8 +845,6 @@ void send_web_heartbeat_withstatusMsg()
 
 void  dispatch_webMsg(char* buf)
 {
-
-
 	switch(buf[0])
 	{
 	case APSERVER_WEB_TEMPLATE_REPORT:
@@ -637,13 +870,42 @@ void  dispatch_webMsg(char* buf)
 		Webtimerflag=WEB_APSERVER_ON;
 		webTimer=web_apServer_heart_out_time;
         break;
-
+	case APSERVER_WEB_REQUEST_LOGINFO:
+		decode_web_AP_log_requestMsg(buf);
+		break;
+	case APSERVER_WEB_SOFTWARE_UPGRADE:
+		decode_web_AP_Soft_UpgradeMsg(buf);
+		break;
 	default:
 		//log_error("Error: Unknown protocol type = %d!\n", envelop->bProtocolSap);
 		break;
 	}
-
-
 }
 
+void Create_LogDir(char* filename) 
+{
+	
+	char file_path[512] = { "\0" };
+	time_t timep;
+	struct tm* ti;
+	time(&timep);
+	ti = gmtime(&timep);
+	snprintf(file_path, 256, "mkdir /home/book/日志信息_%d年%d月%d日%d时%d分%d秒", 1900 + ti->tm_year, 1 + ti->tm_mon, ti->tm_mday, 8 + ti->tm_hour, ti->tm_min, ti->tm_sec);
+	//printf("file_path is:%s\n",file_path);
+	status = system(file_path);//建立目录
+	if (-1 == status) {
+		printf("mkdir error");
+	}
+	else if (!WIFEXITED(status)) {
+		printf("mkdir error");
+	}
+	else if (WEXITSTATUS(status)) {
+		printf("mkdir error");
+	}
+	else 
+	{
+		printf("mkdir success");
+	}
+	strcpy(filename, &file_path[6]);
+}
 
