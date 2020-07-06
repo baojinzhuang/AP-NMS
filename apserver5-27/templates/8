@@ -1,0 +1,12 @@
+ssid_name=ip2.4G
+ssid_passwd=tianxieshiwo
+login_name=
+login_passwd=admin1
+NatOrBridge=0
+ip_pool_start=192.168.1.50
+ip_pool_end=192.168.1.150
+DHCP_Static=0
+ip_addr=192.168.1.1
+ip_gateway=192.168.1.1
+ip_subnet=255.255.255.0
+ip_NMSip=192.168.0.105

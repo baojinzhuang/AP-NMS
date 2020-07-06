@@ -1,0 +1,12 @@
+ssid_name=n301
+ssid_passwd=123456
+login_name=login
+login_passwd=pws
+NatOrBridge=0
+ip_pool_start=255.255.255.255
+ip_pool_end=255.255.255.255
+DHCP_Static=0
+ip_addr=255.255.255.255
+ip_gateway=255.255.255.255
+ip_subnet=255.255.255.0
+ip_NMSip=192.168.0.160

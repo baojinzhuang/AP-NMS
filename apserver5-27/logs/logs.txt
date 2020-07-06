@@ -1,0 +1,182 @@
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[319] : Info: send_to_web:template_report,size=8
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[346] : Info: send_to_web:ap_report,size=5
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月11日21时52分38秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月11日21时53分18秒]:src/apserver/src/messageProcess.c[214] : Info: receive AP_APSERVER_REGISTER_REQ_WITHOUT_CONFIGURATION AP=1769473
+
+[2020年6月11日21时53分18秒]:src/apserver/src/messageProcess.c[216] : Info: send APSERVER_AP_REGISTER_ACK AP=1769473
+
+[2020年6月11日22时16分21秒]:src/apserver/src/messageProcess.c[214] : Info: receive AP_APSERVER_REGISTER_REQ_WITHOUT_CONFIGURATION AP=1769473
+
+[2020年6月11日22时16分21秒]:src/apserver/src/messageProcess.c[216] : Info: send APSERVER_AP_REGISTER_ACK AP=1769473
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[319] : Info: send_to_web:template_report,size=8
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[346] : Info: send_to_web:ap_report,size=5
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时51分33秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[319] : Info: send_to_web:template_report,size=8
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[346] : Info: send_to_web:ap_report,size=5
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分14秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年6月12日9时59分15秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年6月12日9时59分31秒]:src/apserver/src/messageProcess.c[214] : Info: receive AP_APSERVER_REGISTER_REQ_WITHOUT_CONFIGURATION AP=1769473
+
+[2020年6月12日9时59分31秒]:src/apserver/src/messageProcess.c[216] : Info: send APSERVER_AP_REGISTER_ACK AP=1769473
+
+[2020年6月12日9时59分59秒]:src/apserver/src/messageProcess.c[234] : Info: receive AP_APSERVER_REGISTER_COMPLETE AP=1769473
+
+[2020年6月12日9时59分59秒]:src/apserver/src/messageProcess.c[236] : Info: send APSERVER_AP_HEART_BEAT AP=1769473
+
+[2020年6月12日10时0分1秒]:src/apserver/src/main.c[270] : Info: send APSERVER_AP_HEART_BEAT AP:1769473
+
+[2020年6月12日10时0分4秒]:src/apserver/src/main.c[270] : Info: send APSERVER_AP_HEART_BEAT AP:1769473
+
+[2020年6月12日10时0分7秒]:src/apserver/src/main.c[270] : Info: send APSERVER_AP_HEART_BEAT AP:1769473
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[319] : Info: send_to_web:template_report,size=8
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[346] : Info: send_to_web:ap_report,size=5
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[420] : Info: send_to_web:APSERVER_WEB_TEMPLATE_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[446] : Info: add AP,but exist
+
+[2020年7月6日21时13分28秒]:src/apserver/src/messageProcess.c[499] : Info: send_to_web:APSERVER_WEB_AP_MODIFY
+
