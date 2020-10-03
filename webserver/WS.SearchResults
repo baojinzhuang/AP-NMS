@@ -1,0 +1,3 @@
+---- set state = 0 Matches (2 in 0 files) ----
+prompt_info in main.c (webserver_new_1\src\webserver\src) : 				snprintf(sql_insert,512,"update AP set state = 0 where APServer_IP = '%s'",inet_ntoa((&apServer_socket_list[i])->addrAP.sin_addr));
+prompt_info in main.c (webserver_new_1\src\webserver\src) : 				snprintf(sql_insert,512,"update AP set state = 0 where APServer_IP = '%s'",inet_ntoa((&apServer_socket_list[i])->addrAP.sin_addr));
