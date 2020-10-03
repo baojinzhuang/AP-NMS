@@ -1,0 +1,12 @@
+ssid_name=n222
+ssid_passwd=111
+login_name=0
+login_passwd=shenzhenq
+NatOrBridge=1
+ip_pool_start=192.168.0.100
+ip_pool_end=192.168.0.196
+DHCP_Static=1
+ip_addr=192.168.0.100
+ip_gateway=0.0.0.1
+ip_subnet=0.0.0.0
+ip_NMSip=192.168.153.138
